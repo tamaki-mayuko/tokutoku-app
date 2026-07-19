@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>徳徳ネット</title>
+<meta name="description" content="ご近所の助け合いを徳トークンでつなぐ、徳徳ネット">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FAF6EE">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ai:#2E4A7A; --ai-dark:#1E3255;
+  --yamabuki:#E8A200; --yamabuki-deep:#8A6100;
+  --washi:#FAF6EE; --sumi:#33302B; --haiiro:#8A857C;
+  --shu:#B5442E; --line:#E5DFD2; --midori:#3E7A52;
+  --fs:1;
+}
+html.fs-big{ --fs:1.15 }
+html.fs-huge{ --fs:1.3 }
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{
+  margin:0; background:var(--washi); color:var(--sumi);
+  font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Noto Sans JP',sans-serif;
+  font-size:calc(19px * var(--fs)); line-height:1.7;
+}
+#app{max-width:520px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column}
+.screen{flex:1; padding:20px 18px 110px}
+h1{font-size:calc(32px*var(--fs)); margin:0 0 8px}
+h2{font-size:calc(25px*var(--fs)); margin:0 0 6px}
+.sub{color:var(--haiiro); font-size:calc(16px*var(--fs)); margin:0 0 16px}
+.btn{
+  display:block; width:100%; padding:18px 16px; border:none; border-radius:16px;
+  font-family:inherit; font-size:calc(21px*var(--fs)); font-weight:700; cursor:pointer;
+  background:var(--ai); color:#fff; box-shadow:0 4px 0 rgba(0,0,0,.18); margin:0 0 10px;
+  min-height:60px;
+}
+.btn:active{transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn.gold{background:var(--yamabuki)}
+.btn.green{background:var(--midori)}
+.btn.outline{background:#fff; color:var(--ai); border:3px solid var(--ai); box-shadow:none}
+.btn.small{padding:12px 14px; font-size:calc(17px*var(--fs)); min-height:52px}
+.btn:disabled{background:var(--line); color:var(--haiiro); box-shadow:none; cursor:default; transform:none}
+.card{background:#fff; border:2px solid var(--line); border-radius:20px; padding:18px; margin-bottom:14px}
+.chip{
+  display:flex; align-items:center; gap:12px; width:100%; padding:15px 14px; margin-bottom:10px;
+  border-radius:16px; font-family:inherit; font-size:calc(19px*var(--fs)); font-weight:700; text-align:left;
+  background:#fff; color:var(--sumi); border:3px solid var(--line); cursor:pointer; min-height:64px;
+}
+.chip .emo{font-size:calc(27px*var(--fs))}
+.chip .label{flex:1}
+.chip .check{
+  width:32px; height:32px; border-radius:16px; flex-shrink:0; border:3px solid var(--line);
+  display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900;
+}
+.chip.on{background:var(--ai); color:#fff; border-color:var(--ai)}
+.chip.on .check{background:var(--yamabuki); border-color:#fff}
+.badge{
+  display:inline-flex; align-items:center; gap:6px; background:#FFF3D6; border:2px solid var(--yamabuki);
+  border-radius:999px; padding:4px 14px; font-size:calc(16px*var(--fs)); font-weight:800; color:var(--yamabuki-deep);
+}
+.badge .mark{
+  width:24px; height:24px; border-radius:12px; background:var(--yamabuki); color:#fff;
+  display:inline-flex; align-items:center; justify-content:center; font-size:calc(13px*var(--fs)); font-weight:900;
+}
+.nav{
+  position:fixed; bottom:0; left:0; right:0; display:flex; background:#fff;
+  border-top:2px solid var(--line); max-width:520px; margin:0 auto;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav button{
+  flex:1; padding:10px 0 12px; border:none; background:none; font-family:inherit; cursor:pointer;
+  color:var(--haiiro); border-top:4px solid transparent; min-height:64px;
+}
+.nav button.on{color:var(--ai); border-top-color:var(--ai)}
+.nav .e{font-size:calc(24px*var(--fs))}
+.nav .t{font-size:calc(13px*var(--fs)); font-weight:800}
+.rolebar{display:flex; gap:8px; padding:10px 14px; justify-content:center; background:#EFEAE0; flex-wrap:wrap}
+.rolebar button{
+  padding:8px 14px; border-radius:999px; font-family:inherit; font-size:calc(14px*var(--fs)); font-weight:800;
+  border:2px solid var(--line); background:#fff; color:var(--haiiro); cursor:pointer; min-height:44px;
+}
+.rolebar button.on{background:var(--ai); color:#fff; border-color:var(--ai)}
+.rolebar .tag{align-self:center; font-size:calc(12px*var(--fs)); font-weight:800; color:var(--haiiro)}
+.center{text-align:center}
+.stamp{
+  width:96px; height:96px; margin:0 auto 18px; border-radius:48px; background:var(--shu); color:#FFFBF0;
+  display:flex; align-items:center; justify-content:center; font-size:44px; font-weight:900;
+  box-shadow:0 4px 0 rgba(0,0,0,.15);
+}
+.hero{background:var(--ai-dark); border-radius:20px; padding:20px; color:#fff; margin-bottom:14px}
+.hero .num{font-size:calc(30px*var(--fs)); font-weight:900; margin:0 0 12px}
+.passbook{
+  background:linear-gradient(160deg,#FFF6DE,#FFECB8); border-radius:20px; padding:22px;
+  border:2px solid var(--yamabuki); margin-bottom:10px; text-align:center;
+}
+.passbook .total{font-size:calc(50px*var(--fs)); font-weight:900; color:#6E4E00; margin:0}
+.row{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.ledger-item{background:#fff; border:2px solid var(--line); border-radius:16px; padding:13px 16px; margin-bottom:10px; display:flex; gap:10px; align-items:center}
+.notice{background:#EEF3EA; border:2px solid var(--midori); border-radius:16px; padding:14px 16px; margin-bottom:16px; color:var(--midori); font-weight:800; font-size:calc(15px*var(--fs))}
+.muted{color:var(--haiiro); font-size:calc(14px*var(--fs))}
+.gain{font-size:calc(18px*var(--fs)); font-weight:900; color:var(--yamabuki-deep); flex-shrink:0}
+.codebox{
+  width:100%; padding:16px; font-size:calc(24px*var(--fs)); font-family:inherit; font-weight:800;
+  border:3px solid var(--ai); border-radius:16px; text-align:center; letter-spacing:.15em;
+  background:#fff; color:var(--sumi);
+}
+.spin{padding:60px 0; text-align:center; color:var(--haiiro)}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+</style>
+</head>
+<body>
+<div id="app"><div class="spin">読み込み中…</div></div>
+<script>
+// ============================================================
+// ★★★ 設定(セットアップ手順書の3ステップ目) ★★★
+// Supabaseの「Project URL」と「anon public キー」を貼り付けると
+// 本接続モードになります。空のままなら体験デモモードで動きます。
+// ============================================================
+const SUPABASE_URL = "";      // 例: "https://abcdefgh.supabase.co"
+const SUPABASE_ANON_KEY = ""; // 例: "eyJhbGciOi..."
+// ============================================================
+
+const ONLINE = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+// ================= マスターデータ =================
+const SKILLS = [
+  {id:"kaimono", e:"🛒", t:"買い物の代行"},
+  {id:"soge", e:"🚗", t:"病院への送迎"},
+  {id:"denkyu", e:"💡", t:"電球交換・力仕事"},
+  {id:"hanashi", e:"🍵", t:"話し相手・見守り"},
+  {id:"sumaho", e:"📱", t:"スマホの使い方"},
+  {id:"ryori", e:"🍱", t:"料理のおすそ分け"},
+  {id:"niwa", e:"🌿", t:"庭の手入れ"},
+  {id:"gomi", e:"🗑️", t:"ゴミ出し"},
+];
+const FAMILY_TASKS = [
+  {id:"denwa", e:"📞", t:"電話見守り当番に入る", d:"週1回、決まった曜日に電話して様子を記録", gain:3},
+  {id:"support", e:"📱", t:"アプリ操作を電話でサポート", d:"地域の会員さんの「わからない」に遠隔で答える", gain:2},
+  {id:"chirashi", e:"🖍️", t:"座のお知らせ作りを手伝う", d:"お茶会や散歩の会の案内を作って送る", gain:2},
+  {id:"kiroku", e:"📖", t:"地域の助け合い記録の整理", d:"月末に活動記録をまとめて運営に送る", gain:3},
+];
+const DEMO_REQUESTS = [
+  {id:1, requester:{name:"佐藤 きよ", age:82, toku:46}, dist:"徒歩5分", need:"denkyu", need_text:"廊下の電球を替えてほしい", when_text:"今週中"},
+  {id:2, requester:{name:"田中 正雄", age:79, toku:112}, dist:"徒歩8分", need:"kaimono", need_text:"重いお米を買ってきてほしい", when_text:"水曜の午前"},
+  {id:3, requester:{name:"山本 ふみ", age:85, toku:88}, dist:"徒歩3分", need:"hanashi", need_text:"週に一度、お茶の相手をしてほしい", when_text:"毎週金曜"},
+  {id:4, requester:{name:"鈴木 一郎", age:77, toku:15}, dist:"徒歩10分", need:"sumaho", need_text:"孫とビデオ通話ができるようにしてほしい", when_text:"いつでも"},
+];
+const DEMO_CIRCLES = [
+  {id:"cha", emoji:"🍵", name:"水曜お茶の座", descr:"お菓子を持ち寄っておしゃべり", when_text:"毎週水曜 14時", place:"第2集会所", members:8},
+  {id:"igo", emoji:"⚫", name:"囲碁・将棋の座", descr:"初心者歓迎。見学だけでも", when_text:"毎週土曜 10時", place:"公民館", members:12},
+  {id:"sanpo", emoji:"🚶", name:"朝の散歩の座", descr:"公園を一周してラジオ体操", when_text:"毎朝 7時", place:"中央公園 入口", members:15},
+  {id:"yosai", emoji:"🧵", name:"洋裁とつくろいの座", descr:"繕いもの持ち込み歓迎", when_text:"第2・4金曜", place:"第2集会所", members:6},
+];
+
+// ================= 状態 =================
+const S = {
+  mode: ONLINE ? "online" : "demo",
+  me: null,            // ログイン中の会員(online) / 疑似会員(demo)
+  senior: null,        // family時:見守り対象
+  step: "boot",        // boot | login | welcome | can | want | main
+  tab: "home",
+  canDo: [], wantHelp: [],
+  requests: [], circles: [], joined: [], ledger: [], notices: [], familyDone: [],
+  helping: null, celebrate: null, fontStep: 0, busy:false,
+};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const skill = id => SKILLS.find(s=>s.id===id) || {e:"🤝", t:id};
+const fmtDate = iso => { if(!iso) return ""; const d=new Date(iso); return `${d.getMonth()+1}/${d.getDate()}`; };
+
+// ================= データ層 =================
+let sb = null;
+const DB = {
+  // ---- online ----
+  async init(){
+    if(!ONLINE) return this.demoInit();
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const saved = localStorage.getItem("tokutoku_member_id");
+    if(saved){
+      const {data} = await sb.from("members").select("*").eq("id", saved).maybeSingle();
+      if(data){ S.me = data; await this.loadAll(); S.step = (data.role==="senior" && (!data.can_do||data.can_do.length===0)) ? "welcome" : "main"; return; }
+      localStorage.removeItem("tokutoku_member_id");
+    }
+    S.step = "login";
+  },
+  async login(code){
+    const {data, error} = await sb.from("members").select("*").eq("code", code.trim()).maybeSingle();
+    if(error || !data) return {ok:false, msg:"合言葉が見つかりません。導入会でお渡しした紙をご確認ください。"};
+    localStorage.setItem("tokutoku_member_id", data.id);
+    S.me = data;
+    await this.loadAll();
+    S.step = (data.role==="senior" && (!data.can_do||data.can_do.length===0)) ? "welcome" : "main";
+    return {ok:true};
+  },
+  logout(){ localStorage.removeItem("tokutoku_member_id"); location.reload(); },
+  async loadAll(){
+    if(S.mode==="demo") return;
+    const me = S.me;
+    if(me.role === "senior"){
+      S.canDo = me.can_do||[]; S.wantHelp = me.want_help||[];
+      const [req, cir, myc, led] = await Promise.all([
+        sb.from("requests").select("*, requester:member_id(name, age, toku)").eq("status","open").neq("member_id", me.id),
+        sb.from("circles").select("*"),
+        sb.from("circle_members").select("circle_id").eq("member_id", me.id),
+        sb.from("ledger").select("*").eq("member_id", me.id).order("created_at",{ascending:false}).limit(50),
+      ]);
+      S.requests = (req.data||[]).filter(r => S.canDo.includes(r.need));
+      S.circles = cir.data||[];
+      S.joined = (myc.data||[]).map(x=>x.circle_id);
+      S.ledger = led.data||[];
+      const fresh = await sb.from("members").select("toku").eq("id", me.id).single();
+      if(fresh.data) S.me.toku = fresh.data.toku;
+    } else {
+      const [sen, deeds] = await Promise.all([
+        sb.from("members").select("*").eq("id", me.family_of).single(),
+        sb.from("family_deeds").select("task_id").eq("family_id", me.id),
+      ]);
+      S.senior = sen.data;
+      S.familyDone = (deeds.data||[]).map(x=>x.task_id);
+      const not = await sb.from("notices").select("*").eq("senior_id", me.family_of).order("created_at",{ascending:false}).limit(30);
+      S.notices = (not.data||[]).map(n=>({e:n.emoji, t:n.body, time:fmtDate(n.created_at)}));
+    }
+  },
+  async saveProfile(){
+    if(S.mode==="demo") return;
+    await sb.from("members").update({can_do:S.canDo, want_help:S.wantHelp}).eq("id", S.me.id);
+    // 「してほしいこと」を依頼として自動登録(重複は避ける)
+    const {data:mine} = await sb.from("requests").select("need").eq("member_id", S.me.id).eq("status","open");
+    const existing = (mine||[]).map(r=>r.need);
+    const rows = S.wantHelp.filter(n=>!existing.includes(n)).map(n=>({
+      member_id:S.me.id, need:n, need_text:skill(n).t+" をお願いしたい", when_text:"相談して決める", status:"open"
+    }));
+    if(rows.length) await sb.from("requests").insert(rows);
+    await this.loadAll();
+  },
+  async notify(emoji, body, seniorId){
+    if(S.mode==="demo"){ S.notices.unshift({e:emoji, t:body, time:"たった今"}); return; }
+    await sb.from("notices").insert({senior_id: seniorId, emoji, body});
+  },
+  async accept(r){
+    const label = `${S.me?.name||"お母様"}さんが ${r.requester.name}さんの「${skill(r.need).t}」を引き受けました`;
+    if(S.mode==="demo"){ await this.notify("🤝", label, null); return; }
+    await sb.from("requests").update({status:"matched", helper_id:S.me.id}).eq("id", r.id);
+    await this.notify("🤝", label, S.me.id);
+  },
+  async finish(r, gain){
+    const label = `${S.me?.name||"お母様"}さんが ${r.requester.name}さんのお手伝いを無事に終えました(+徳${gain})`;
+    if(S.mode==="demo"){
+      S.me.toku += gain;
+      S.ledger.unshift({descr:`${r.requester.name}さんを手伝った`, amount:gain, created_at:null, kind:"self", _date:"きょう"});
+      S.requests = S.requests.filter(x=>x.id!==r.id);
+      await this.notify("✅", label, null); return;
+    }
+    await sb.from("requests").update({status:"done"}).eq("id", r.id);
+    await sb.from("ledger").insert({member_id:S.me.id, descr:`${r.requester.name}さんを手伝った`, amount:gain, kind:"self"});
+    await sb.from("members").update({toku: S.me.toku + gain}).eq("id", S.me.id);
+    await this.notify("✅", label, S.me.id);
+    await this.loadAll();
+  },
+  async joinCircle(c){
+    const label = `${S.me?.name||"お母様"}さんが「${c.name}」に参加しました`;
+    if(S.mode==="demo"){
+      S.joined.push(c.id); S.me.toku += 1;
+      S.ledger.unshift({descr:`「${c.name}」に参加`, amount:1, kind:"circle", _date:"きょう"});
+      await this.notify("🍵", label, null); return;
+    }
+    await sb.from("circle_members").insert({circle_id:c.id, member_id:S.me.id});
+    await sb.from("ledger").insert({member_id:S.me.id, descr:`「${c.name}」に参加`, amount:1, kind:"circle"});
+    await sb.from("members").update({toku: S.me.toku + 1}).eq("id", S.me.id);
+    await this.notify("🍵", label, S.me.id);
+    await this.loadAll();
+  },
+  async familyTask(t){
+    if(S.mode==="demo"){
+      S.familyDone.push(t.id); S.me.toku += t.gain;
+      S.ledger.unshift({descr:`孫の陽菜さんから 仕送り徳(${t.t})`, amount:t.gain, kind:"family", _date:"きょう"});
+      return;
+    }
+    await sb.from("family_deeds").insert({family_id:S.me.id, task_id:t.id});
+    await sb.from("ledger").insert({member_id:S.me.family_of, descr:`${S.me.name}さんから 仕送り徳(${t.t})`, amount:t.gain, kind:"family"});
+    await sb.from("members").update({toku: S.senior.toku + t.gain}).eq("id", S.me.family_of);
+    await this.loadAll();
+  },
+  // ---- demo ----
+  demoInit(){
+    S.me = {name:"あなた", role:"senior", toku:3};
+    S.requests = JSON.parse(JSON.stringify(DEMO_REQUESTS));
+    S.circles = JSON.parse(JSON.stringify(DEMO_CIRCLES));
+    S.ledger = [{descr:"はじめの一歩", amount:3, kind:"self", _date:"登録記念"}];
+    S.notices = [{e:"🌱", t:"お母様が「徳徳ネット」に登録しました", time:"3日前"}];
+    S.step = "welcome";
+  },
+  demoSwitchRole(r){
+    if(r==="family"){ S.senior = {toku:S.me.toku}; S.me.role="family"; }
+    else S.me.role="senior";
+  },
+};
+
+// ================= 操作 =================
+const A = {
+  async login(){
+    const el = document.getElementById("code");
+    const code = el ? el.value : "";
+    if(!code){ alert("合言葉を入れてください"); return; }
+    S.busy = true; render();
+    const r = await DB.login(code);
+    S.busy = false;
+    if(!r.ok) alert(r.msg);
+    render();
+  },
+  logout(){ if(confirm("この電話からログアウトしますか?")) DB.logout(); },
+  setStep(s){S.step=s; render()},
+  setTab(t){S.tab=t; render()},
+  fontCycle(){
+    S.fontStep=(S.fontStep+1)%3;
+    document.documentElement.className = ["","fs-big","fs-huge"][S.fontStep];
+    render();
+  },
+  demoRole(r){ if(S.mode!=="demo")return; DB.demoSwitchRole(r); render(); },
+  toggleCan(id){const i=S.canDo.indexOf(id); i<0?S.canDo.push(id):S.canDo.splice(i,1); render()},
+  toggleWant(id){const i=S.wantHelp.indexOf(id); i<0?S.wantHelp.push(id):S.wantHelp.splice(i,1); render()},
+  async saveProfile(){
+    S.busy=true; render();
+    await DB.saveProfile();
+    S.busy=false; S.step="main"; S.tab="home"; render();
+  },
+  async accept(id){
+    const r=S.requests.find(x=>String(x.id)===String(id));
+    S.helping=r; await DB.accept(r); render();
+  },
+  cancelHelp(){S.helping=null; render()},
+  async finish(){
+    const r=S.helping, gain=5;
+    S.busy=true; render();
+    await DB.finish(r, gain);
+    S.busy=false; S.helping=null;
+    S.celebrate={title:"ありがとうございました", body:`${r.requester.name}さんを助けて`, gain};
+    render();
+  },
+  closeCelebrate(){S.celebrate=null; S.tab="book"; render()},
+  async join(id){
+    if(S.joined.includes(id))return;
+    const c=S.circles.find(x=>x.id===id);
+    S.busy=true; render();
+    await DB.joinCircle(c);
+    S.busy=false; render();
+  },
+  openZa(){alert("試作版:「座をひらく」は、集まりの種類と曜日を選ぶだけで開けるようにする予定です。開いた人には毎回 徳2枚。")},
+  async familyTask(id){
+    if(S.familyDone.includes(id))return;
+    const t=FAMILY_TASKS.find(x=>x.id===id);
+    S.busy=true; render();
+    await DB.familyTask(t);
+    S.busy=false; render();
+  },
+  async refresh(){ S.busy=true; render(); await DB.loadAll(); S.busy=false; render(); },
+};
+
+// ================= 部品 =================
+const badge = n => `<span class="badge"><span class="mark">徳</span>${n}</span>`;
+const chips = (sel, fn) => SKILLS.map(s=>`
+  <button class="chip ${sel.includes(s.id)?"on":""}" onclick="A.${fn}('${s.id}')">
+    <span class="emo">${s.e}</span><span class="label">${esc(s.t)}</span>
+    <span class="check">${sel.includes(s.id)?"✓":""}</span>
+  </button>`).join("");
+
+const navBar = () => {
+  const items=[["home","🏠","ホーム"],["help","🤝","たすける"],["za","🍵","座"],["book","📖","徳通帳"]];
+  return `<nav class="nav">${items.map(([id,e,t])=>`
+    <button class="${S.tab===id?"on":""}" onclick="A.setTab('${id}')">
+      <div class="e">${e}</div><div class="t">${t}</div>
+    </button>`).join("")}</nav>`;
+};
+
+const roleBar = () => {
+  const mode = S.mode==="demo"
+    ? `<button class="${S.me?.role==="senior"?"on":""}" onclick="A.demoRole('senior')">👵 高齢者の画面</button>
+       <button class="${S.me?.role==="family"?"on":""}" onclick="A.demoRole('family')">👨‍👩‍👧 家族の画面</button>
+       <span class="tag">体験版</span>`
+    : `<span class="tag">${esc(S.me?.name||"")}さん</span>
+       ${S.me?`<button onclick="A.refresh()">🔄 最新にする</button><button onclick="A.logout()">出る</button>`:""}`;
+  return `<div class="rolebar">${mode}
+    <button onclick="A.fontCycle()">文字 ${["標準","大","特大"][S.fontStep]}</button>
+  </div>`;
+};
+
+// ================= 画面 =================
+function viewLogin(){
+  return `<div class="screen center" style="padding-top:44px">
+    <div class="stamp">徳</div>
+    <h1>徳徳ネット</h1>
+    <p class="sub">導入会でお渡しした「合言葉」を<br>入れてください。</p>
+    <input id="code" class="codebox" placeholder="あいことば" autocomplete="off">
+    <div style="margin-top:18px">
+      <button class="btn" ${S.busy?"disabled":""} onclick="A.login()">${S.busy?"確認中…":"はいる"}</button>
+    </div>
+    <p class="muted">合言葉がわからないときは、地域の窓口<br>またはご家族にお尋ねください。</p>
+  </div>`;
+}
+
+function viewFamily(){
+  const toku = S.mode==="demo" ? S.me.toku : (S.senior?.toku ?? "—");
+  const sname = S.mode==="demo" ? "おかあさん" : (S.senior?.name ? S.senior.name+"さん" : "ご家族");
+  return `
+  <div class="screen">
+    <h2>${esc(sname)}の見守り</h2>
+    <p class="sub">現在の徳:${badge(toku)}</p>
+    <div class="notice">🌱 徳はお金では買えません。<br>家族も「行い」で徳を贈ります。</div>
+    <p style="font-weight:800; margin:0 0 10px">📮 見守り通知</p>
+    ${S.notices.length===0?`<div class="card muted center">まだ通知はありません。</div>`:""}
+    ${S.notices.map(n=>`
+      <div class="ledger-item"><span style="font-size:22px">${n.e}</span>
+        <div style="flex:1"><div style="font-weight:600">${esc(n.t)}</div><div class="muted">${esc(n.time)}</div></div>
+      </div>`).join("")}
+    <p style="font-weight:800; margin:18px 0 4px">🎁 仕送り徳をおくる</p>
+    <p class="sub" style="margin-bottom:12px">遠くからでもできる「行い」で徳を稼ぎ、${esc(sname)}の通帳に贈れます。</p>
+    ${FAMILY_TASKS.map(t=>{
+      const ok=S.familyDone.includes(t.id);
+      return `<div class="card">
+        <div class="row" style="align-items:flex-start; margin-bottom:10px">
+          <span style="font-size:26px">${t.e}</span>
+          <div style="flex:1; padding:0 8px">
+            <div style="font-weight:800">${esc(t.t)}</div>
+            <div class="muted">${esc(t.d)}</div>
+          </div>${badge("+"+t.gain)}
+        </div>
+        <button class="btn small ${ok?"green":""}" ${ok||S.busy?"disabled":""} onclick="A.familyTask('${t.id}')">
+          ${ok?"✓ 徳を贈りました":"この行いをする"}
+        </button>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+function viewWelcome(){
+  return `<div class="screen center" style="padding-top:44px">
+    <div class="stamp">徳</div>
+    <h1>徳徳ネット</h1>
+    <p class="sub" style="font-size:calc(18px*var(--fs))">いま誰かを助けると、<br>いつかの自分が助けられる。</p>
+    <p>入力するのは <b>2つだけ</b>。</p>
+    <div style="margin-top:28px"><button class="btn" onclick="A.setStep('can')">はじめる</button></div>
+  </div>`;
+}
+
+function viewCan(){
+  return `<div class="screen">
+    <p class="muted">その1(ぜんぶで2つ)</p>
+    <h2>できること は?</h2>
+    <p class="sub">あてはまるものを押してください。いくつでも。</p>
+    ${chips(S.canDo,"toggleCan")}
+    <div style="margin-top:14px">
+      <button class="btn" ${S.canDo.length===0?"disabled":""} onclick="A.setStep('want')">つぎへ</button>
+    </div>
+  </div>`;
+}
+
+function viewWant(){
+  return `<div class="screen">
+    <p class="muted">その2(これで最後)</p>
+    <h2>してほしいこと は?</h2>
+    <p class="sub">いまは無くても大丈夫。あとで変えられます。</p>
+    ${chips(S.wantHelp,"toggleWant")}
+    <div style="margin-top:14px">
+      <button class="btn" ${S.busy?"disabled":""} onclick="A.saveProfile()">${S.busy?"登録中…":"登録する"}</button>
+    </div>
+  </div>`;
+}
+
+function viewCelebrate(){
+  const c=S.celebrate;
+  return `<div class="screen center" style="padding-top:56px">
+    <div class="stamp" style="width:120px;height:120px;border-radius:60px;background:var(--yamabuki);font-size:34px">+${c.gain}</div>
+    <h2>${esc(c.title)}</h2>
+    <p>${esc(c.body)}<br><b style="color:var(--yamabuki-deep)">徳トークンを ${c.gain} 枚</b> 受け取りました。</p>
+    <p class="muted">ご家族にも「無事に終わりました」と<br>お知らせしました 📮</p>
+    <p class="muted">この徳は、次の世代へのバトンです。</p>
+    <div style="margin-top:24px"><button class="btn" onclick="A.closeCelebrate()">徳通帳を見る</button></div>
+  </div>`;
+}
+
+function viewHelping(){
+  const r=S.helping, s=skill(r.need);
+  return `<div class="screen" style="padding-top:36px">
+    <h2>お約束ができました</h2>
+    <p style="color:var(--midori); font-weight:700; font-size:calc(15px*var(--fs)); margin:0 0 16px">📮 ご家族に「引き受けました」とお知らせ済み</p>
+    <div class="card">
+      <div style="font-size:calc(21px*var(--fs)); font-weight:800">${esc(r.requester.name)} さん${r.requester.age?`(${r.requester.age})`:""}</div>
+      <div class="muted" style="margin-bottom:12px">希望:${esc(r.when_text||"相談して決める")}</div>
+      <div style="font-size:calc(19px*var(--fs))">${s.e} ${esc(r.need_text)}</div>
+    </div>
+    <button class="btn gold" ${S.busy?"disabled":""} onclick="A.finish()">${S.busy?"記帳中…":"手伝いが終わった"}</button>
+    <button class="btn outline" onclick="A.cancelHelp()">やめておく</button>
+  </div>`;
+}
+
+function viewHome(){
+  return `<div class="screen">
+    <div class="row" style="margin-bottom:14px"><h2 style="margin:0">こんにちは${S.me?.name && S.mode==="online" ? "、"+esc(S.me.name)+"さん" : ""}</h2>${badge(S.me?.toku ?? 0)}</div>
+    <div class="hero">
+      <div style="opacity:.85; font-size:calc(15px*var(--fs))">ご近所であなたを待っている人</div>
+      <div class="num">${S.requests.length} 人</div>
+      <button class="btn gold" style="margin:0" onclick="A.setTab('help')">助けられる人を見る</button>
+    </div>
+    <div class="card">
+      <div style="font-weight:800; margin-bottom:6px">🍵 きょうの座</div>
+      <div style="margin-bottom:12px">${
+        S.joined.length>0
+          ? "参加中:"+S.joined.map(id=>esc((S.circles.find(c=>c.id===id)||{}).name||"")).join("、")
+          : "まだ参加している座がありません。お茶会や散歩の会をのぞいてみませんか。"
+      }</div>
+      <button class="btn small outline" style="margin:0" onclick="A.setTab('za')">座をさがす</button>
+    </div>
+    <div class="card">
+      <div style="font-weight:800; margin-bottom:6px">あなたの登録</div>
+      <div><b style="color:var(--ai)">できること:</b> ${S.canDo.map(id=>esc(skill(id).t)).join("、")||"未登録"}</div>
+      <div><b style="color:var(--shu)">してほしいこと:</b> ${S.wantHelp.map(id=>esc(skill(id).t)).join("、")||"いまは無し"}</div>
+      <div style="margin-top:10px"><button class="btn small outline" style="margin:0" onclick="A.setStep('can')">登録を変える</button></div>
+    </div>
+  </div>`;
+}
+
+function viewHelp(){
+  return `<div class="screen">
+    <h2>あなたを待っている人</h2>
+    <p class="sub">あなたの「できること」に合う依頼です。引き受けるとご家族にもお知らせが届きます。</p>
+    ${S.requests.length===0?`<div class="card center" style="padding:28px">
+        <div style="font-size:calc(19px*var(--fs))">いまは依頼がありません 🍵</div>
+        <div class="muted" style="margin-top:8px">新しい依頼が届いたらここに出ます。</div>
+      </div>`:""}
+    ${S.requests.map(r=>{
+      const s=skill(r.need);
+      return `<div class="card">
+        <div class="row" style="margin-bottom:4px">
+          <div style="font-size:calc(20px*var(--fs)); font-weight:800">${esc(r.requester.name)} さん${r.requester.age?`(${r.requester.age})`:""}</div>
+          ${badge(r.requester.toku ?? 0)}
+        </div>
+        <div class="muted" style="margin-bottom:8px">${esc(r.dist||"ご近所")} ・ 希望:${esc(r.when_text||"相談して決める")}</div>
+        <div style="margin-bottom:14px">${s.e} ${esc(r.need_text)}</div>
+        <button class="btn" style="margin:0" onclick="A.accept('${r.id}')">手伝います</button>
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+function viewZa(){
+  return `<div class="screen">
+    <h2>座(ざ)— 楽しみの集まり</h2>
+    <p class="sub">助ける・助けられるだけでなく、一緒に楽しむ場所です。参加するだけで徳がひとつ。</p>
+    ${S.circles.map(c=>{
+      const isIn=S.joined.includes(c.id);
+      return `<div class="card">
+        <div style="display:flex; gap:12px; margin-bottom:12px">
+          <span style="font-size:30px">${c.emoji||"🍵"}</span>
+          <div>
+            <div style="font-size:calc(19px*var(--fs)); font-weight:800">${esc(c.name)}</div>
+            <div class="muted">${esc(c.descr||"")}<br>${esc(c.when_text||"")} ・ ${esc(c.place||"")}</div>
+          </div>
+        </div>
+        <button class="btn small ${isIn?"green":""}" style="margin:0" ${isIn||S.busy?"disabled":""} onclick="A.join('${c.id}')">
+          ${isIn?"✓ 参加しています":"参加する(+徳1)"}
+        </button>
+      </div>`;
+    }).join("")}
+    <button class="btn outline" onclick="A.openZa()">🌸 自分で座をひらく(+徳2)</button>
+  </div>`;
+}
+
+function viewBook(){
+  const mark={self:"🤝", family:"🎁", circle:"🍵"};
+  return `<div class="screen">
+    <h2>徳通帳</h2>
+    <div class="passbook">
+      <div style="color:var(--yamabuki-deep); font-weight:700; font-size:calc(15px*var(--fs))">あなたの徳トークン</div>
+      <p class="total">${S.me?.toku ?? 0}<span style="font-size:calc(21px*var(--fs))"> 枚</span></p>
+      <div style="color:var(--yamabuki-deep); font-size:calc(14px*var(--fs))">将来「してほしいこと」を頼むとき、<br>このバトンが次の世代に渡ります。</div>
+    </div>
+    <p class="muted center" style="margin:0 0 16px">※徳はお金と交換できません。行いだけが徳になります。</p>
+    <p style="font-weight:800; margin:0 0 10px">これまでの記録</p>
+    ${S.ledger.length===0?`<div class="card muted center">まだ記録はありません。</div>`:""}
+    ${S.ledger.map(l=>`
+      <div class="ledger-item">
+        <span style="font-size:22px">${mark[l.kind]||"🤝"}</span>
+        <div style="flex:1"><div style="font-weight:700">${esc(l.descr)}</div><div class="muted">${esc(l._date||fmtDate(l.created_at))}</div></div>
+        <span class="gain">+${l.amount}</span>
+      </div>`).join("")}
+  </div>`;
+}
+
+// ================= 描画 =================
+function render(){
+  let body;
+  if(S.step==="boot") body = `<div class="spin">読み込み中…</div>`;
+  else if(S.step==="login") body = viewLogin();
+  else if(S.me?.role==="family") body = viewFamily();
+  else if(S.step==="welcome") body = viewWelcome();
+  else if(S.step==="can") body = viewCan();
+  else if(S.step==="want") body = viewWant();
+  else if(S.celebrate) body = viewCelebrate();
+  else if(S.helping) body = viewHelping();
+  else body = (S.tab==="home"?viewHome():S.tab==="help"?viewHelp():S.tab==="za"?viewZa():viewBook()) + navBar();
+  document.getElementById("app").innerHTML = roleBar() + body;
+  window.scrollTo(0,0);
+}
+
+// ================= 起動 =================
+async function boot(){
+  if(ONLINE){
+    // supabase-js を読み込む
+    await new Promise((res, rej)=>{
+      const s=document.createElement("script");
+      s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js";
+      s.onload=res; s.onerror=rej;
+      document.head.appendChild(s);
+    }).catch(()=>alert("通信に失敗しました。電波の良いところでもう一度お試しください。"));
+    // 家族画面の見守り通知を30秒ごとに更新
+    setInterval(async ()=>{
+      if(S.me?.role==="family" && !S.busy){ await DB.loadAll(); render(); }
+    }, 30000);
+  }
+  await DB.init();
+  render();
+}
+boot();
+
+// PWA: Service Worker 登録
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
